@@ -29,7 +29,8 @@ FROM python:3.13.2-alpine3.21
 
 RUN apk update && \
 apk add ffmpeg ca-certificates curl wget gnutls --no-cache && \
-pip install "yt-dlp[default,curl-cffi,mutagen,pycryptodomex,phantomjs,secretstorage]"
+pip install "yt-dlp[default,curl-cffi,mutagen,pycryptodomex,phantomjs,secretstorage]" \
+pip install -U --pre yt-dlp[default]
 
 VOLUME /downloads /config
 
