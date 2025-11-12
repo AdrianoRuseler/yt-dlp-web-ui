@@ -4,11 +4,24 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
+    image: yt-dlp-webui-xbuild:latest  # Name the built image
     ports:
       - 3033:3033
     volumes:
-      - ./downloads:/downloads # replace <your dir> with a directory on your host system
+      - ./downloads:/downloads 
       - ./config.yml:/config/config.yml
     healthcheck:
       test: curl -f http://localhost:3033 || exit 1
+    restart: unless-stopped
+
+  apache-proxy:
+    image: httpd:2.4
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ./apache/ssl:/usr/local/apache2/conf/ssl
+    depends_on:
+      - yt-dlp-webui-xbuild
     restart: unless-stopped

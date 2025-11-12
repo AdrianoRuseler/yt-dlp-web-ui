@@ -2,6 +2,14 @@
 > A poll is up to decide the future of yt-dlp-web-ui frontend! If you're interested you can take part.  
 > https://github.com/marcopiovanello/yt-dlp-web-ui/discussions/223
 
+```sh
+docker build -t ruseler/yt-dlp-webui-xbuild:latest .
+```
+
+```sh
+docker pull ruseler/yt-dlp-webui-xbuild:latest
+```
+
 # yt-dlp Web UI
 
 A not so terrible web ui for yt-dlp. 
@@ -105,7 +113,7 @@ docker run -d \
 ```yaml
 services:
   yt-dlp-webui:
-    image: marcobaobao/yt-dlp-webui
+    image: ruseler/yt-dlp-webui-xbuild:latest
     ports:
       - 3033:3033
     volumes:
