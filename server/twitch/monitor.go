@@ -95,7 +95,8 @@ func DEFAULT_DOWNLOAD_HANDLER(db *internal.MemoryDB, mq *internal.MessageQueue) 
 		p := &internal.Process{
 			Url:        url,
 			Livestream: true,
-			Params:     []string{"--downloader", "ffmpeg", "--no-part"},
+			// download audio only: extract audio (-x) and set best audio quality (0)
+			Params:     []string{"--downloader", "ffmpeg", "--no-part", "-x", "--audio-quality", "0"},
 		}
 		db.Set(p)
 		mq.Publish(p)
