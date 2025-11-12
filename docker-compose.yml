@@ -1,11 +1,14 @@
 services:
-  yt-dlp-webui:
-    image: marcobaobao/yt-dlp-webui
+  yt-dlp-webui-xbuild:
+    # image: marcobaobao/yt-dlp-webui
+    build: 
+      context: .
+      dockerfile: Dockerfile
     ports:
       - 3033:3033
     volumes:
-      - <your dir>:/downloads # replace <your dir> with a directory on your host system
-      - <your dir>:/config    # directory where config.yml will be stored
+      - ./downloads:/downloads # replace <your dir> with a directory on your host system
+      - ./config.yml:/config/config.yml
     healthcheck:
       test: curl -f http://localhost:3033 || exit 1
     restart: unless-stopped

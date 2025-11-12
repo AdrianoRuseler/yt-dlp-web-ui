@@ -1,0 +1,10 @@
+# https://github.com/marcopiovanello/yt-dlp-web-ui/wiki/Authentication-methods
+require_auth: true
+username: your_username
+password: your_password
+
+# https://github.com/marcopiovanello/yt-dlp-web-ui/wiki/Twitch-integration
+twitch:
+  client_id: your-client-id
+  client_secret: your-secret
+  check_interval: 2m         # follows standard go Duration format (e.g. 2m30s, 1h, 30s)

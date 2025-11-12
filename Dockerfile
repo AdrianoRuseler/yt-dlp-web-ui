@@ -25,12 +25,13 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o yt-dlp-webui
 # -----------------------------------------------------------------------------
 
 # Runtime ---------------------------------------------------------------------
+# https://hub.docker.com/_/python/tags?name=alpine
 FROM python:3.13-alpine3.22
 
 RUN apk update && \
-apk add ffmpeg ca-certificates curl wget gnutls --no-cache && \
-pip install "yt-dlp[default,curl-cffi,mutagen,pycryptodomex,phantomjs,secretstorage]" && \
-pip install -U --pre yt-dlp[default]
+    apk add ffmpeg ca-certificates curl wget gnutls --no-cache && \
+    pip install "yt-dlp[default,curl-cffi,mutagen,pycryptodomex,phantomjs,secretstorage]" && \
+    pip install -U --pre yt-dlp[default]
 
 VOLUME /downloads /config
 
