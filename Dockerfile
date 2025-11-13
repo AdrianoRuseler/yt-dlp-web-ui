@@ -2,7 +2,7 @@
 FROM node:lts-slim AS ui
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack prepare pnpm@10.0.0 --activate && corepack enable
+RUN corepack prepare pnpm@latest --activate && corepack enable
 COPY . /usr/src/yt-dlp-webui
 
 WORKDIR /usr/src/yt-dlp-webui/frontend
