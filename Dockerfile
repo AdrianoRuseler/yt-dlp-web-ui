@@ -40,6 +40,9 @@ WORKDIR /app
 
 COPY --from=build /usr/src/yt-dlp-webui/yt-dlp-webui /app
 
+# Using a build dependency and cleaning it up instantly
+RUN rm -rf /var/cache/apk/* /tmp/* /root/.cache 
+
 #ENV JWT_SECRET=secret
 RUN JWT_SECRET=$(head /dev/urandom | base64 | tr -dc A-Za-z0-9 | head -c 43)
 
