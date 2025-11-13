@@ -1,5 +1,5 @@
 # Node (pnpm) ------------------------------------------------------------------
-FROM node:22-slim AS ui
+FROM node:lts-slim AS ui
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack prepare pnpm@10.0.0 --activate && corepack enable
@@ -39,7 +39,8 @@ WORKDIR /app
 
 COPY --from=build /usr/src/yt-dlp-webui/yt-dlp-webui /app
 
-ENV JWT_SECRET=secret
+#ENV JWT_SECRET=secret
+RUN JWT_SECRET=$(head /dev/urandom | base64 | tr -dc A-Za-z0-9 | head -c 43)
 
 EXPOSE 3033
 ENTRYPOINT [ "./yt-dlp-webui" , "--out", "/downloads", "--conf", "/config/config.yml", "--db", "/config/local.db" ]
