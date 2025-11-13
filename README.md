@@ -10,9 +10,7 @@ docker build -t ruseler/yt-dlp-webui-xbuild:latest .
 docker pull ruseler/yt-dlp-webui-xbuild:latest
 ```
 
-# yt-dlp Web UI
-
-A not so terrible web ui for yt-dlp. 
+# Nightly yt-dlp Web UI
 
 High performance extendeable web ui and RPC server for yt-dlp with low impact on resources.
 
