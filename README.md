@@ -1,6 +1,3 @@
-> [!NOTE]  
-> A poll is up to decide the future of yt-dlp-web-ui frontend! If you're interested you can take part.  
-> https://github.com/marcopiovanello/yt-dlp-web-ui/discussions/223
 
 ```sh
 docker build -t ruseler/yt-dlp-webui-xbuild:latest .
@@ -10,7 +7,7 @@ docker build -t ruseler/yt-dlp-webui-xbuild:latest .
 docker pull ruseler/yt-dlp-webui-xbuild:latest
 ```
 
-# Nightly yt-dlp Web UI
+## Nightly yt-dlp Web UI
 
 High performance extendeable web ui and RPC server for yt-dlp with low impact on resources.
 
