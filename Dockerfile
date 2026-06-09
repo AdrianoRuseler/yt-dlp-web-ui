@@ -1,50 +1,59 @@
-# Node (pnpm) ------------------------------------------------------------------
+# ==============================================================================
+# 1. Frontend Build Stage (Node + pnpm)
+# ==============================================================================
 FROM node:lts-slim AS ui
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+
 RUN corepack prepare pnpm@latest --activate && corepack enable
-COPY . /usr/src/yt-dlp-webui
 
 WORKDIR /usr/src/yt-dlp-webui/frontend
 
-RUN rm -rf node_modules
+# Copy package files first to leverage Docker layer caching
+COPY frontend/package.json frontend/pnpm-lock.yaml* ./
 
-RUN pnpm install
+# FIX: Force pnpm to completely skip or approve lifecycle script blocks inline
+RUN pnpm install --frozen-lockfile --config.ignore-scripts=true
+
+# Copy the rest of the frontend source and build
+COPY frontend/ .
 RUN pnpm run build
-# -----------------------------------------------------------------------------
 
-# Go --------------------------------------------------------------------------
-FROM golang AS build
+# ==============================================================================
+# 2. Backend Build Stage (Go)
+# ==============================================================================
+FROM golang:alpine AS build 
+RUN apk add --no-cache git
 
 WORKDIR /usr/src/yt-dlp-webui
 
+# Cache Go modules
+COPY go.mod go.sum* ./
+RUN go mod download
+
+# Copy backend source and the compiled frontend from the 'ui' stage
 COPY . .
-COPY --from=ui /usr/src/yt-dlp-webui/frontend /usr/src/yt-dlp-webui/frontend
+COPY --from=ui /usr/src/yt-dlp-webui/frontend/dist /usr/src/yt-dlp-webui/frontend/dist
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o yt-dlp-webui
-# -----------------------------------------------------------------------------
+# Build static binary
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o yt-dlp-webui .
 
-# Runtime ---------------------------------------------------------------------
-# https://hub.docker.com/_/python/tags?name=alpine
-FROM python:3.13-alpine3.22
+# ==============================================================================
+# 3. Runtime Stage (Python + Dependencies)
+# ==============================================================================
+FROM python:alpine
 
-RUN apk update && \
-    apk add ffmpeg ca-certificates curl wget gnutls --no-cache && \
-    pip install "yt-dlp[default,curl-cffi,mutagen,pycryptodomex,phantomjs,secretstorage]" && \
-    python -m pip install --upgrade pip && \
-    pip install -U --pre yt-dlp[default]
-
-VOLUME /downloads /config
+# Combine everything into a single, optimized runtime installation layer
+RUN apk add --no-cache ffmpeg ca-certificates curl wget gnutls && \
+    pip install --no-cache-dir -U pip && \
+    pip install --no-cache-dir --pre "yt-dlp[default,curl-cffi,mutagen,pycryptodomex,phantomjs,secretstorage]"
 
 WORKDIR /app
 
-COPY --from=build /usr/src/yt-dlp-webui/yt-dlp-webui /app
+# Copy only the compiled binary from the Go build stage
+COPY --from=build /usr/src/yt-dlp-webui/yt-dlp-webui /app/yt-dlp-webui
 
-# Using a build dependency and cleaning it up instantly
-RUN rm -rf /var/cache/apk/* /tmp/* /root/.cache 
-
-#ENV JWT_SECRET=secret
-RUN JWT_SECRET=$(head /dev/urandom | base64 | tr -dc A-Za-z0-9 | head -c 43)
-
+VOLUME /downloads /config
 EXPOSE 3033
-ENTRYPOINT [ "./yt-dlp-webui" , "--out", "/downloads", "--conf", "/config/config.yml", "--db", "/config/local.db" ]
+
+ENTRYPOINT [ "./yt-dlp-webui", "--out", "/downloads", "--conf", "/config/config.yml", "--db", "/config/local.db" ]
